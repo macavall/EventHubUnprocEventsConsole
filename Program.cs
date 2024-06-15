@@ -21,18 +21,26 @@ public class EventHubSequenceNumberRetriever
 
     public static async Task Main()
     {
+        await PrintFinalResults(await GetUnprocessedEvents(await GetStorageCheckpointValues(), await GetEventHubLastSequences()));
+
+        Console.ReadLine();
+    }
+
+    public static async Task SetConfigurations()
+    {
+        await Task.Delay(1);
+
         var builder = new ConfigurationBuilder()
-            .SetBasePath(AppContext.BaseDirectory)
-            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-            .AddEnvironmentVariables();
+        .SetBasePath(AppContext.BaseDirectory)
+        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+        .AddEnvironmentVariables();
 
         IConfiguration config = builder.Build();
 
         if (config["consumerGroup"] != "")
         {
             consumerGroup = config["consumerGroup"];
-                        Console.WriteLine("ConsumerGroup is not set in appsettings.json or environment variables.");
-            //return;
+            Console.WriteLine("ConsumerGroup is not set in appsettings.json or environment variables.");
         }
 
         connectionString = config["EventHubConnectionString"];
@@ -41,17 +49,15 @@ public class EventHubSequenceNumberRetriever
         StorageAccountName = config["StorageAccountName"];
         StorageConnectionString = config["StorageConnectionString"];
         StorageEventHubContainer = config["StorageEventHubContainer"];
+    }
 
-        var storChecksDict = await GetStorageCheckpointValues();
-        var eventHubLastSeqDict = await GetEventHubLastSequences();
-        var finalResult = await GetUnprocessedEvents(storChecksDict, eventHubLastSeqDict);
-
-        foreach (var kvp in finalResult)
+    public static async Task PrintFinalResults(Dictionary<int, int> finalResultsInput)
+    {
+        await Task.Delay(1);
+        foreach (var kvp in finalResultsInput)
         {
             Console.WriteLine("PartitionId: " + kvp.Key + " UnprocessedEvents: " + kvp.Value);
         }
-
-        Console.ReadLine();
     }
 
     public static async Task<Dictionary<int, int>> GetUnprocessedEvents(Dictionary<int, int> storChecks, Dictionary<int, int> EventSeqs)
