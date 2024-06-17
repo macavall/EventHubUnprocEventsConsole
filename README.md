@@ -11,3 +11,5 @@ This is an example of the `appsettings.json` file that will be located in the ro
   "consumerGroup": "$Default"
 }
 ```
+
+![image](https://github.com/macavall/EventHubUnprocEventsConsole/assets/43223084/7b188ddc-9dc7-4199-a8d0-79851e2a6de8)
